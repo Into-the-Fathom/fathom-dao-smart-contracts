@@ -17,8 +17,12 @@ contract StakingGetters is StakingStorage, IStakingGetter, StakingInternals {
         return locks[account];
     }
 
-    function getStreamClaimableAmountPerLock(uint256 streamId, address account, uint256 lockId) external view override returns (uint256) {
-        require(streams[streamId].status == StreamStatus.ACTIVE, "stream not active");
+    function getStreamClaimableAmountPerLock(
+        uint256 streamId,
+        address account,
+        uint256 lockId
+    ) external view override returns (uint256) {
+        require(streams[streamId].status == StreamStatus.ACTIVE, "stream inactive");
         require(lockId <= locks[account].length, "bad index");
         uint256 latestRps = _getLatestRewardsPerShare(streamId);
         User storage userAccount = users[account];
@@ -28,9 +32,7 @@ contract StakingGetters is StakingStorage, IStakingGetter, StakingInternals {
         return ((latestRps - userRpsPerLock) * userSharesOfLock) / RPS_MULTIPLIER;
     }
 
-    function getStream(
-        uint256 streamId
-    )
+    function getStream(uint256 streamId)
         external
         view
         override
@@ -60,14 +62,6 @@ contract StakingGetters is StakingStorage, IStakingGetter, StakingInternals {
 
     function getStreamSchedule(uint256 streamId) external view override returns (uint256[] memory scheduleTimes, uint256[] memory scheduleRewards) {
         return (streams[streamId].schedule.time, streams[streamId].schedule.reward);
-    }
-
-    function getStreamsCount() external view override returns (uint256) {
-        return streams.length;
-    }
-
-    function getLatestRewardsPerShare(uint256 streamId) external view override returns (uint256) {
-        return _getLatestRewardsPerShare(streamId);
     }
 
     function getWeight() external view override returns (Weight memory) {

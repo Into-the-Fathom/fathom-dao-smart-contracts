@@ -63,14 +63,14 @@ describe('MultiSig Wallet', () => {
             }]
         }, [accounts[2]]);
 
-        encoded_add_owner_function = web3.eth.abi.encodeFunctionCall({
-            name: 'addOwner',
+        encoded_add_owners_function = web3.eth.abi.encodeFunctionCall({
+            name: 'addOwners',
             type: 'function',
             inputs: [{
-                type: 'address',
+                type: 'address[]',
                 name: 'owner'
             }]
-        }, [accounts[2]]);
+        }, [[accounts[2]]]);
 
         encoded_change_requirement_function = web3.eth.abi.encodeFunctionCall({
             name: 'changeRequirement',
@@ -79,7 +79,7 @@ describe('MultiSig Wallet', () => {
                 type: 'uint256',
                 name: '_required'
             }]
-        }, ['1']);
+        }, ['2']);
 
     });
 
@@ -88,7 +88,8 @@ describe('MultiSig Wallet', () => {
             const result = await multiSigWallet.submitTransaction(
                 multiSigWallet.address, 
                 EMPTY_BYTES, 
-                encoded_add_owner_function, 
+                encoded_add_owners_function,
+                0,
                 {"from": accounts[0]}
             );
             txIndex1 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -98,7 +99,8 @@ describe('MultiSig Wallet', () => {
             const result = await multiSigWallet.submitTransaction(
                 multiSigWallet.address, 
                 EMPTY_BYTES, 
-                encoded_remove_owner_function, 
+                encoded_remove_owner_function,
+                0,
                 {"from": accounts[0]}
             );
             txIndex2 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -109,7 +111,8 @@ describe('MultiSig Wallet', () => {
             const result = await multiSigWallet.submitTransaction(
                 multiSigWallet.address, 
                 EMPTY_BYTES, 
-                encoded_change_requirement_function, 
+                encoded_change_requirement_function,
+                0,
                 {"from": accounts[0]}
             );
             txIndex3 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -126,13 +129,13 @@ describe('MultiSig Wallet', () => {
             );
 
             await shouldRevert(
-                multiSigWallet.addOwner(accounts[3], {"from": accounts[1]}),
+                multiSigWallet.addOwners([accounts[3]], {"from": accounts[1]}),
                 errTypes.revert,
                 errorMessage
             );
         });
 
-        it('Should confirm transaction 1, 2and 3, from accounts[0], the first signer', async() => {
+        it('Should confirm transaction 1, 2 and 3, from accounts[0], the first signer', async() => {
             await multiSigWallet.confirmTransaction(txIndex1, {"from": accounts[0]});
             await multiSigWallet.confirmTransaction(txIndex2, {"from": accounts[0]});
             await multiSigWallet.confirmTransaction(txIndex3, {"from": accounts[0]});
@@ -148,8 +151,9 @@ describe('MultiSig Wallet', () => {
             );
         });
 
-        it('Should confirm transactions 1 and 3, only, from accounts[1], the second signer', async() => {
+        it('Should confirm transactions 1, 2 and 3, only, from accounts[1], the second signer', async() => {
             await multiSigWallet.confirmTransaction(txIndex1, {"from": accounts[1]});
+            await multiSigWallet.confirmTransaction(txIndex2, {"from": accounts[1]});
             await multiSigWallet.confirmTransaction(txIndex3, {"from": accounts[1]});
         });
 
@@ -178,11 +182,40 @@ describe('MultiSig Wallet', () => {
             expect((owners_after_removal[1])).to.equal(accounts[1]);
         });
 
+        it('Should confirm transactions 3, only, from accounts[3], the third signer', async() => {
+            await multiSigWallet.confirmTransaction(txIndex3, {"from": accounts[2]});
+        });
+
+        it('Revoke confirmation for tx 3 and expect transaction to fail when execution is tried, then reconfirm', async() => {
+
+            await multiSigWallet.revokeConfirmation(txIndex3, {from: accounts[1]});
+
+            let errorMessage = "cannot execute tx";
+
+            await shouldRevert(
+                multiSigWallet.executeTransaction(txIndex3, {from: accounts[1]}),
+                errTypes.revert,
+                errorMessage
+            );
+
+            await multiSigWallet.confirmTransaction(txIndex3, {"from": accounts[1]});
+        });
+
+        it('Fail xecute the transaction to remove third signer because min number of confirmations not reached', async() => {
+            let errorMessage = "cannot execute tx";
+
+            await shouldRevert(
+                multiSigWallet.executeTransaction(txIndex2, {from: accounts[0]}),
+                errTypes.revert,
+                errorMessage
+            );
+        });
+
         it('Execute the transaction to change the minimum number of required confirmations to execute a proposal', async() => {
             await multiSigWallet.executeTransaction(txIndex3, {"from": accounts[0]});
         });
 
-        it('Execute the transaction to REMOVE an owner, even though it was only signed by one account', async() => {
+        it('Execute the transaction to REMOVE an owner, even though it was only signed by two account', async() => {
             await multiSigWallet.executeTransaction(txIndex2, {"from": accounts[0]});
             owners_after_addition = await multiSigWallet.getOwners();
 
@@ -198,7 +231,8 @@ describe('MultiSig Wallet', () => {
             const result = await multiSigWallet.submitTransaction(
                 mainToken.address, 
                 EMPTY_BYTES, 
-                encoded_transfer_function, 
+                encoded_transfer_function,
+                0,
                 {"from": accounts[0]}
             );
             txIndex4 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];

@@ -28,7 +28,15 @@ abstract contract ERC20Permit is ERC20, IERC20Permit, EIP712 {
         return _domainSeparatorV4();
     }
 
-    function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) public virtual override {
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public virtual override {
         // solhint-disable-next-line
         require(block.timestamp <= deadline, "ERC20Permit: expired deadline");
 

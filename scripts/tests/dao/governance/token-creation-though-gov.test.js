@@ -152,7 +152,8 @@ describe('Token Creation Through Governance', () => {
             const result = await multiSigWallet.submitTransaction(
                 FTHMToken.address, 
                 EMPTY_BYTES, 
-                _encodeTransferFunction(_account), 
+                _encodeTransferFunction(_account),
+                0,
                 {"from": accounts[0]}
             );
             txIndex4 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -166,12 +167,12 @@ describe('Token Creation Through Governance', () => {
         const _stakeMainGetVe = async (_account) => {
 
             await _transferFromMultiSigTreasury(_account);
-            await FTHMToken.approve(stakingService.address, T_TO_STAKE, {from: _account});
+            await FTHMToken.approve(vaultService.address, T_TO_STAKE, {from: _account});
             await blockchain.increaseTime(20);
 
             let unlockTime = lockingPeriod;
 
-            await stakingService.createLock(T_TO_STAKE, unlockTime, _account,{from: _account, gas: 600000});
+            await stakingService.createLock(T_TO_STAKE, unlockTime,{from: _account, gas: 600000});
         }
 
         it('Stake MainToken and receive vMainToken', async() => {
@@ -319,7 +320,8 @@ describe('Token Creation Through Governance', () => {
             const result = await multiSigWallet.submitTransaction(
                 mainTokenGovernor.address, 
                 EMPTY_BYTES, 
-                encodedConfirmation1, 
+                encodedConfirmation1,
+                0,
                 {"from": accounts[0]}
             );
             txIndex1 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];

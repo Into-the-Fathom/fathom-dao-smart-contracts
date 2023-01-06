@@ -101,7 +101,11 @@ abstract contract EIP712 {
         return ECDSA.toTypedDataHash(_domainSeparatorV4(), structHash);
     }
 
-    function _buildDomainSeparator(bytes32 typeHash, bytes32 nameHash, bytes32 versionHash) private view returns (bytes32) {
+    function _buildDomainSeparator(
+        bytes32 typeHash,
+        bytes32 nameHash,
+        bytes32 versionHash
+    ) private view returns (bytes32) {
         return keccak256(abi.encode(typeHash, nameHash, versionHash, getChainID(), address(this)));
     }
 }

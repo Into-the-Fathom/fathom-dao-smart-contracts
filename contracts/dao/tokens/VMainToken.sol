@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 contract VMainToken is IVMainToken, Pausable, AccessControl, Initializable, ERC20Votes {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant WHITELISTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant WHITELISTER_ROLE = keccak256("WHITELISTER_ROLE");
     bool private initialized;
     // Mapping to keep track of who is allowed to transfer voting tokens
     mapping(address => bool) public isWhiteListed;
@@ -22,8 +22,7 @@ contract VMainToken is IVMainToken, Pausable, AccessControl, Initializable, ERC2
     }
 
     function initToken(address _admin, address _minter) public override initializer onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(!initialized, "already init");
-        initialized = true;
+        require(_admin != msg.sender, "initToken: Admin should be different than msg.sender");
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
         _grantRole(PAUSER_ROLE, _admin);
         _grantRole(MINTER_ROLE, _minter);
@@ -45,6 +44,16 @@ contract VMainToken is IVMainToken, Pausable, AccessControl, Initializable, ERC2
         emit MemberRemovedFromWhitelist(_toRemove);
     }
 
+    function grantMinterRole(address _minter) public override onlyRole(getRoleAdmin(MINTER_ROLE)) {
+        _grantRole(MINTER_ROLE, _minter);
+        addToWhitelist(_minter);
+    }
+
+    function revokeMinterRole(address _minter) public override onlyRole(getRoleAdmin(MINTER_ROLE)) {
+        _grantRole(MINTER_ROLE, _minter);
+        removeFromWhitelist(_minter);
+    }
+
     function pause() public override onlyRole(PAUSER_ROLE) {
         _pause();
     }
@@ -62,20 +71,20 @@ contract VMainToken is IVMainToken, Pausable, AccessControl, Initializable, ERC2
         _burn(account, amount);
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal override whenNotPaused {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override whenNotPaused {
         require(isWhiteListed[msg.sender], "VMainToken: is intransferable unless the sender is whitelisted");
         super._beforeTokenTransfer(from, to, amount);
     }
 
-    function _afterTokenTransfer(address from, address to, uint256 amount) internal override {
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal override {
         super._afterTokenTransfer(from, to, amount);
-    }
-
-    function _mint(address to, uint256 amount) internal override {
-        super._mint(to, amount);
-    }
-
-    function _burn(address account, uint256 amount) internal override {
-        super._burn(account, amount);
     }
 }

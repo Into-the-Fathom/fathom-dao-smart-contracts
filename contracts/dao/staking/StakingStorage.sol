@@ -4,7 +4,6 @@
 
 pragma solidity 0.8.13;
 
-import "./StakingStructs.sol";
 import "./interfaces/IStakingStorage.sol";
 import "./library/StakingLibrary.sol";
 
@@ -16,6 +15,7 @@ contract StakingStorage {
     uint64 internal constant ONE_MONTH = 2629746;
     uint64 internal constant ONE_YEAR = 31536000;
     //MAX_LOCK: It is a constant. One WEEK Added as a tolerance.
+
     uint256 public maxLockPeriod;
     ///@notice Checks if the staking is initialized
 
@@ -41,6 +41,7 @@ contract StakingStorage {
     address public voteToken;
     address public vault;
     address public rewardsCalculator;
+    bool public councilsInitialized;
 
     ///Weighting coefficient for shares and penalties
     Weight internal weight;
@@ -48,7 +49,7 @@ contract StakingStorage {
     mapping(address => User) public users;
 
     Stream[] internal streams;
-
     ///Mapping (user => LockedBalance) to keep locking information for each user
     mapping(address => LockedBalance[]) internal locks;
+    mapping(uint256 => uint256) public streamTotalUserPendings;
 }

@@ -9,7 +9,7 @@ import "./GovernorVotes.sol";
 
 abstract contract GovernorVotesQuorumFraction is GovernorVotes {
     uint256 private _quorumNumerator;
-
+    uint256 public constant MINIMUM_QUORUM_NUMERATOR = uint256(2);
     event QuorumNumeratorUpdated(uint256 oldQuorumNumerator, uint256 newQuorumNumerator);
 
     /**
@@ -54,7 +54,7 @@ abstract contract GovernorVotesQuorumFraction is GovernorVotes {
 
     function _updateQuorumNumerator(uint256 newQuorumNumerator) internal virtual {
         require(newQuorumNumerator <= quorumDenominator(), "GovernorVotesQuorumFraction: quorumNumerator over quorumDenominator");
-
+        require(newQuorumNumerator >= MINIMUM_QUORUM_NUMERATOR, "GovernorVotesQuorumFraction: quorumNumerator less than Minimum");
         uint256 oldQuorumNumerator = _quorumNumerator;
         _quorumNumerator = newQuorumNumerator;
 

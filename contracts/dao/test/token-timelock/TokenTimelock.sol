@@ -26,7 +26,11 @@ contract TokenTimelock is ITokenTimelock {
     // timestamp when token release is enabled
     uint256 private immutable _releaseTime;
 
-    constructor(IERC20 token_, address beneficiary_, uint256 releaseTime_) {
+    constructor(
+        IERC20 token_,
+        address beneficiary_,
+        uint256 releaseTime_
+    ) {
         // solhint-disable-next-line
         require(releaseTime_ > block.timestamp, "TokenTimelock: release time is before current time");
         _token = token_;

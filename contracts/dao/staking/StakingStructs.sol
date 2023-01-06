@@ -55,6 +55,7 @@ struct Stream {
     address owner; // stream owned by the ERC-20 reward token owner
     address manager; // stream manager handled by Main stream manager role
     address rewardToken;
+    StreamStatus status;
     uint256 rewardDepositAmount; // the reward amount that has been deposited by third party
     uint256 rewardClaimedAmount; /// how much rewards have been claimed by stakers
     uint256 maxDepositAmount; // maximum amount of deposit
@@ -62,5 +63,10 @@ struct Stream {
     uint256 tau; // pending time prior reward release
     uint256 rps; // Reward per share for a stream j>0
     Schedule schedule;
-    StreamStatus status;
+}
+
+struct CreateLockParams {
+    uint256 amount;
+    uint256 lockPeriod;
+    address account;
 }

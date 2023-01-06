@@ -11,10 +11,11 @@ import "../TimelockController.sol";
 abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     TimelockController private _timelock;
     mapping(uint256 => bytes32) private _timelockIds;
-
+    mapping(uint256 => bool) private isProposalExecuted;
     event TimelockChange(address oldTimelock, address newTimelock);
 
     constructor(TimelockController timelockAddress) {
+        require(address(timelockAddress) != address(0), "timelockAddress cant be zero address");
         _updateTimelock(timelockAddress);
     }
 
@@ -76,13 +77,15 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     }
 
     function _execute(
-        uint256 /* proposalId */,
+        uint256 proposalId,
         address[] memory targets,
         uint256[] memory values,
         bytes[] memory calldatas,
         bytes32 descriptionHash
     ) internal virtual override {
+        require(!isProposalExecuted[proposalId], "_execute: proposal already executed");
         _timelock.executeBatch{ value: msg.value }(targets, values, calldatas, 0, descriptionHash);
+        isProposalExecuted[proposalId] = true;
     }
 
     // This function can reenter through the external call to the timelock, but we assume the timelock is trusted and
@@ -109,6 +112,7 @@ abstract contract GovernorTimelockControl is IGovernorTimelock, Governor {
     }
 
     function _updateTimelock(TimelockController newTimelock) private {
+        require(address(newTimelock) != address(0), "updateTimelock: newTimelock address cannot be zero address");
         emit TimelockChange(address(_timelock), address(newTimelock));
         _timelock = newTimelock;
     }

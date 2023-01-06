@@ -15,4 +15,6 @@ interface IStakingStorage {
     function totalAmountOfStakedToken() external view returns (uint256);
 
     function totalPenaltyBalance() external view returns (uint256);
+
+    function streamTotalUserPendings(uint256 streamId) external view returns (uint256);
 }

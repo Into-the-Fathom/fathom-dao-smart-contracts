@@ -15,7 +15,11 @@ abstract contract GovernorSettings is Governor {
     event VotingPeriodSet(uint256 oldVotingPeriod, uint256 newVotingPeriod);
     event ProposalThresholdSet(uint256 oldProposalThreshold, uint256 newProposalThreshold);
 
-    constructor(uint256 initialVotingDelay, uint256 initialVotingPeriod, uint256 initialProposalThreshold) {
+    constructor(
+        uint256 initialVotingDelay,
+        uint256 initialVotingPeriod,
+        uint256 initialProposalThreshold
+    ) {
         _setVotingDelay(initialVotingDelay);
         _setVotingPeriod(initialVotingPeriod);
         _setProposalThreshold(initialProposalThreshold);
@@ -58,6 +62,7 @@ abstract contract GovernorSettings is Governor {
 
     function _setProposalThreshold(uint256 newProposalThreshold) internal virtual {
         emit ProposalThresholdSet(_proposalThreshold, newProposalThreshold);
+        require(newProposalThreshold > 0, "_setProposalThreshold: Threshold for proposal cant be zero");
         _proposalThreshold = newProposalThreshold;
     }
 }

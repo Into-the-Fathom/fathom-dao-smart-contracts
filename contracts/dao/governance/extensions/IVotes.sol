@@ -10,7 +10,14 @@ interface IVotes {
 
     function delegate(address delegatee) external;
 
-    function delegateBySig(address delegatee, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external;
+    function delegateBySig(
+        address delegatee,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
 
     function getVotes(address account) external view returns (uint256);
 

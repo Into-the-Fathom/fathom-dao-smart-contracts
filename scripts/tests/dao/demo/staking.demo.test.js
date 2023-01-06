@@ -258,7 +258,8 @@ describe("Staking Test and Upgrade Test", () => {
             const result = await multiSigWallet.submitTransaction(
                 FTHMToken.address, 
                 EMPTY_BYTES, 
-                _encodeTransferFunction(_account, _value), 
+                _encodeTransferFunction(_account, _value),
+                0,
                 {"from": accounts[0]}
             );
             txIndex4 = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -284,7 +285,8 @@ describe("Staking Test and Upgrade Test", () => {
             const result = await multiSigWallet.submitTransaction(
                 vaultService.address, 
                 EMPTY_BYTES, 
-                _encodeAddSupportedTokenFunction(_token), 
+                _encodeAddSupportedTokenFunction(_token),
+                0,
                 {"from": accounts[0]}
             );
             const tx = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -305,7 +307,7 @@ describe("Staking Test and Upgrade Test", () => {
         expectedTotalAmountOfVFTHM = new web3.utils.BN(0)
         it('Should create a lock possition with lockId = 1 for staker_1', async() => {
             // So that staker 1 can actually stake the token:
-            await FTHMToken.approve(stakingService.address, sumToApprove, {from: staker_1})
+            await FTHMToken.approve(vaultService.address, sumToApprove, {from: staker_1})
             const beforeFTHMBalance = await FTHMToken.balanceOf(staker_1);
 
             await blockchain.increaseTime(20);
@@ -314,7 +316,7 @@ describe("Staking Test and Upgrade Test", () => {
             const unlockTime = lockingPeriod;
             console.log(".........Creating a Lock Position for staker 1.........");
 
-            let result = await stakingService.createLock(sumToDeposit,unlockTime, staker_1,{from: staker_1});
+            let result = await stakingService.createLock(sumToDeposit,unlockTime,{from: staker_1});
             // Since block time stamp can change after locking, we record the timestamp, 
             // later to be used in the expectedNVFTHM calculation.  
             // This mitigates an error created from the slight change in block time.
@@ -349,7 +351,7 @@ describe("Staking Test and Upgrade Test", () => {
             
             const unlockTime = lockingPeriod;
             console.log(".........Creating a second Lock Position for staker 1.........");
-            let result = await stakingService.createLock(sumToDeposit, unlockTime, staker_1, {from: staker_1, gas:maxGasForTxn});
+            let result = await stakingService.createLock(sumToDeposit, unlockTime, {from: staker_1, gas:maxGasForTxn});
             
             let eventArgs = eventsHelper.getIndexedEventArgs(result, "Staked(address,uint256,uint256,uint256,uint256,uint256)");
             const lockInfo = await stakingGetterService.getLockInfo(staker_1,2)
@@ -383,14 +385,14 @@ describe("Staking Test and Upgrade Test", () => {
             
             const sumToDepositForAll = web3.utils.toWei('0.11', 'ether');
 
-            await FTHMToken.approve(stakingService.address, sumToApprove, {from: staker_2})
-            await FTHMToken.approve(stakingService.address, sumToApprove, {from: staker_3})
+            await FTHMToken.approve(vaultService.address, sumToApprove, {from: staker_2})
+            await FTHMToken.approve(vaultService.address, sumToApprove, {from: staker_3})
             
             await blockchain.mineBlock(await _getTimeStamp() + 20);
             console.log(".........Creating a Lock Position for staker 2 and Staker 3.......");
-            let result1 = await stakingService.createLock(sumToDepositForAll,unlockTime,staker_2, {from: staker_2});
+            let result1 = await stakingService.createLock(sumToDepositForAll,unlockTime, {from: staker_2});
             await blockchain.mineBlock(await _getTimeStamp() + 20);
-            let result2 = await stakingService.createLock(sumToDepositForAll,unlockTime, staker_3,{from: staker_3});
+            let result2 = await stakingService.createLock(sumToDepositForAll,unlockTime,{from: staker_3});
             await blockchain.mineBlock(await _getTimeStamp() + 20);
 
             let eventArgs1 = eventsHelper.getIndexedEventArgs(result1, "Staked(address,uint256,uint256,uint256,uint256,uint256)");
@@ -435,7 +437,8 @@ describe("Staking Test and Upgrade Test", () => {
                     _encodeUpgradeFunction(
                         _proxy,
                         _impl
-                    ), 
+                    ),
+                    0,
                     {"from": accounts[0]}
                 );
                 const tx = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -469,7 +472,8 @@ describe("Staking Test and Upgrade Test", () => {
                     _encodeUpgradeFunction(
                         _proxy,
                         _impl
-                    ), 
+                    ),
+                    0,
                     {"from": accounts[0]}
                 );
                 const tx = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -514,19 +518,7 @@ describe("Staking Test and Upgrade Test", () => {
             console.log(".........total Amount Of Stream Shares: ", totalAmountOfStreamShares.toString());
         });
 
-        it("Should not early unlock", async() => {
-            await FTHMToken.approve(stakingService.address, sumToApprove, {from: SYSTEM_ACC})
-            let lockingPeriod = 365 * 24 * 60 * 60;
-            await stakingService.createLockWithoutEarlyWithdraw(sumToDeposit,lockingPeriod, staker_5,{from: SYSTEM_ACC});
-            await blockchain.mineBlock(await _getTimeStamp() + 20);
-            const errorMessage = "early infeasible";
-
-            await shouldRevert(
-                stakingService.earlyUnlock(1, {from: staker_5}),
-                errTypes.revert,  
-                errorMessage
-            );
-        })
+        
     });
     
     describe('Creating Streams and Rewards Calculations', async() => {
@@ -568,7 +560,8 @@ describe("Staking Test and Upgrade Test", () => {
                         _scheduleTimes,
                         _scheduleRewards,
                         _tau
-                    ), 
+                    ),
+                    0,
                     {"from": accounts[0]}
                 );
                 const tx = eventsHelper.getIndexedEventArgs(result, SUBMIT_TRANSACTION_EVENT)[0];
@@ -597,7 +590,7 @@ describe("Staking Test and Upgrade Test", () => {
             console.log(".........Creating the stream proposed.........")
             console.log("Once create stream is called, the proposal will become live once start time is reached")
             const RewardProposalAmountForAStream = web3.utils.toWei('1000', 'ether');
-            await streamReward2.approve(stakingService.address, RewardProposalAmountForAStream, {from:stream_rewarder_2})
+            await streamReward2.approve(vaultService.address, RewardProposalAmountForAStream, {from:stream_rewarder_2})
             await stakingService.createStream(streamId,RewardProposalAmountForAStream, {from: stream_rewarder_2});
         })
 

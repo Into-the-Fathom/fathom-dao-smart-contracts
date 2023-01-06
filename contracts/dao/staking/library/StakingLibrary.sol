@@ -6,7 +6,11 @@ pragma solidity 0.8.13;
 import "../StakingStructs.sol";
 
 library StakingLibrary {
-    function _caclulateAutoCompoundingShares(uint256 amount, uint256 totalShares, uint256 totalAmountOfStakedToken) internal pure returns (uint256) {
+    function _caclulateAutoCompoundingShares(
+        uint256 amount,
+        uint256 totalShares,
+        uint256 totalAmountOfStakedToken
+    ) internal pure returns (uint256) {
         uint256 _amountOfShares = 0;
         if (totalShares == 0) {
             _amountOfShares = amount;
@@ -21,7 +25,12 @@ library StakingLibrary {
         return _amountOfShares;
     }
 
-    function _getWeightedPenalty(uint256 lockEnd, uint256 timestamp, Weight memory weight, uint256 maxLock) internal pure returns (uint256) {
+    function _getWeightedPenalty(
+        uint256 lockEnd,
+        uint256 timestamp,
+        Weight memory weight,
+        uint256 maxLock
+    ) internal pure returns (uint256) {
         uint256 slopeStart = lockEnd;
         if (timestamp >= slopeStart) return 0;
         uint256 remainingTime = slopeStart - timestamp;

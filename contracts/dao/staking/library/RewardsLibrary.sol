@@ -58,7 +58,11 @@ library RewardsLibrary {
         return _getRewardsSchedule(stream, start, end);
     }
 
-    function _getRewardsSchedule(Stream memory stream, uint256 start, uint256 end) internal pure returns (uint256) {
+    function _getRewardsSchedule(
+        Stream memory stream,
+        uint256 start,
+        uint256 end
+    ) internal pure returns (uint256) {
         Schedule memory schedule = stream.schedule;
         uint256 startIndex;
         uint256 endIndex;
@@ -79,7 +83,7 @@ library RewardsLibrary {
             // Here reward = from end of start schedule till beginning of end schedule
             // Reward during the period from startIndex + 1  to endIndex
             rewardScheduledAmount += schedule.reward[startIndex + 1] - schedule.reward[endIndex];
-            // Reward at the end schedule where schedule.time[endIndex] '
+            // Reward at the end schedule where schedule.time[endIndex]
             reward = schedule.reward[endIndex] - schedule.reward[endIndex + 1];
             rewardScheduledAmount += (reward * (end - schedule.time[endIndex])) / (schedule.time[endIndex + 1] - schedule.time[endIndex]);
         }

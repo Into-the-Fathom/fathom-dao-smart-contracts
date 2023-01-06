@@ -16,7 +16,11 @@ contract RewardsInternals is StakingStorage, IStakingEvents {
         }
     }
 
-    function _moveRewardsToPending(address account, uint256 streamId, uint256 lockId) internal {
+    function _moveRewardsToPending(
+        address account,
+        uint256 streamId,
+        uint256 lockId
+    ) internal {
         LockedBalance storage lock = locks[account][lockId - 1];
         require(streams[streamId].status == StreamStatus.ACTIVE, "inactive");
         User storage userAccount = users[account];
@@ -26,6 +30,7 @@ contract RewardsInternals is StakingStorage, IStakingEvents {
 
         if (reward == 0) return; // All rewards claimed or stream schedule didn't start
         userAccount.pendings[streamId] += reward;
+        streamTotalUserPendings[streamId] += reward;
         userAccount.rpsDuringLastClaimForLock[lockId][streamId] = streams[streamId].rps;
         userAccount.releaseTime[streamId] = block.timestamp + streams[streamId].tau;
         // If the stream is blacklisted, remaining unclaimed rewards will be transfered out.
