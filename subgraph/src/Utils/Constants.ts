@@ -1,11 +1,11 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 
 export class Constants{
-    public static STAKING_CONTRACT:string = '0xa8402AFd8ed9F4cfC9B149dcC13973777dCa143c'
-    public static STAKING_GETTER:string = '0xB6ec5308fEA0C6C11Cce35712a399Ef6741CA8DF'
-    public static VFTHM:string = '0x4981c2553A5580eb0Ad5F6efA9d0F2A82CF88353'
+    public static STAKING_CONTRACT:string = '0xEe948cf2DFf205f50F48BD7CC9B80aFE6303688A'
+    public static STAKING_GETTER:string = '0xD0e108f0e6857dF03ABcCea1c75DeFF07Ef1e975'
+    public static VFTHM:string = '0x1Df3e6C64dbeACb61f9974A9555a555EF8eC3791'
 
-    public static GOVERNANCE:string = '0xDcDa226fa9c23E7F6c88DB8a607Cc0E2DD3E17C7'
+    public static GOVERNANCE:string = '0x786be460ad0b14Dc16D93f3065428f6b8fC0b00b'
 
     public static WAD:BigInt = BigInt.fromI64(10**18)
     public static RAY:BigInt = BigInt.fromI64( 10**27)

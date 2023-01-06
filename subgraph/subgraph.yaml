@@ -6,7 +6,7 @@ dataSources:
     name: Governor
     network: mainnet
     source:
-      address: "0xDcDa226fa9c23E7F6c88DB8a607Cc0E2DD3E17C7"
+      address: "0x786be460ad0b14Dc16D93f3065428f6b8fC0b00b"
       abi: Governor
       startBlock: 42201579
     mapping:
@@ -31,7 +31,7 @@ dataSources:
     name: StakingPackage
     network: mainnet
     source:
-      address: "0xa8402AFd8ed9F4cfC9B149dcC13973777dCa143c"
+      address: "0xEe948cf2DFf205f50F48BD7CC9B80aFE6303688A"
       abi: StakingPackage
       startBlock: 42201579
     mapping:

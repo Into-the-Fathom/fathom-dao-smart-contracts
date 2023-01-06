@@ -21328,12 +21328,12 @@
     },
     "networks": {
         "51": {
-            "address": "0x23CDEc0B757c25D40c07502D6A6d6A35A153F15e",
-            "transactionHash": "0x8aab5b5387281bd8b20306a7d34df6ec7af796e52885b0577f15409ae11d0646"
+            "address": "0xD0e108f0e6857dF03ABcCea1c75DeFF07Ef1e975",
+            "transactionHash": "0x39844643dc239f4f4b054ed808156848c991b69987db7c176d5e6e6d83ffa6d1"
         }
     },
     "schemaVersion": "3.4.10",
-    "updatedAt": "2022-12-12T16:38:32.975Z",
+    "updatedAt": "2023-01-05T12:04:52.856Z",
     "devdoc": {
         "kind": "dev",
         "methods": {
